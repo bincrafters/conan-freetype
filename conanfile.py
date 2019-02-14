@@ -3,6 +3,7 @@
 
 from conans import ConanFile, CMake, tools
 import os
+import shutil
 
 
 class FreetypeConan(ConanFile):
@@ -107,15 +108,50 @@ class FreetypeConan(ConanFile):
         cmake = self._configure_cmake()
         cmake.build()
 
+    def _make_freetype_config(self):
+        freetype_config_in = os.path.join(self._source_subfolder, "builds", "unix", "freetype-config.in")
+        os.makedirs(os.path.join(self.package_folder, "bin"))
+        freetype_config = os.path.join(self.package_folder, "bin", "freetype-config")
+        shutil.copy(freetype_config_in, freetype_config)
+        libs = "-lfreetyped" if self.settings.build_type == "Debug" else "-lfreetype"
+        staticlibs = "-lm %s" % libs if self.settings.os == "Linux" else libs
+        libtool_version = "22.0.16"  # check docs/version.txt, this is a different version mumber!
+        tools.replace_in_file(freetype_config, r"%PKG_CONFIG%", r"/bin/false")  # never use pkg-config
+        tools.replace_in_file(freetype_config, r"%prefix%", r"$conan_prefix")
+        tools.replace_in_file(freetype_config, r"%exec_prefix%", r"$conan_exec_prefix")
+        tools.replace_in_file(freetype_config, r"%includedir%", r"$conan_includedir")
+        tools.replace_in_file(freetype_config, r"%libdir%", r"$conan_libdir")
+        tools.replace_in_file(freetype_config, r"%ft_version%", r"$conan_ftversion")
+        tools.replace_in_file(freetype_config, r"%LIBSSTATIC_CONFIG%", r"$conan_staticlibs")
+        tools.replace_in_file(freetype_config, r"-lfreetype", libs)
+        tools.replace_in_file(freetype_config, r"export LC_ALL", """export LC_ALL
+BINDIR=$(dirname $0)
+conan_prefix=$(dirname $BINDIR)
+conan_exec_prefix=${{conan_prefix}}/bin
+conan_includedir=${{conan_prefix}}/include
+conan_libdir=${{conan_prefix}}/lib
+conan_ftversion={version}
+conan_staticlibs="{staticlibs}"
+""".format(version=libtool_version, staticlibs=staticlibs))
+
     def package(self):
         cmake = self._configure_cmake()
         cmake.install()
+        self._make_freetype_config()
         self.copy("FTL.TXT", dst="licenses", src=os.path.join(self._source_subfolder, "docs"))
         self.copy("GPLv2.TXT", dst="licenses", src=os.path.join(self._source_subfolder, "docs"))
         self.copy("LICENSE.TXT", dst="licenses", src=os.path.join(self._source_subfolder, "docs"))
+
+    @staticmethod
+    def _chmod_plus_x(filename):
+        if os.name == 'posix':
+            os.chmod(filename, os.stat(filename).st_mode | 0o111)
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
         if self.settings.os == "Linux":
             self.cpp_info.libs.append("m")
         self.cpp_info.includedirs.append(os.path.join("include", "freetype2"))
+        freetype_config = os.path.join(self.package_folder, "bin", "freetype-config")
+        self.env_info.FT2_CONFIG = freetype_config
+        self._chmod_plus_x(freetype_config)
