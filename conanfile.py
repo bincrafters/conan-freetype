@@ -110,7 +110,8 @@ class FreetypeConan(ConanFile):
 
     def _make_freetype_config(self):
         freetype_config_in = os.path.join(self._source_subfolder, "builds", "unix", "freetype-config.in")
-        os.makedirs(os.path.join(self.package_folder, "bin"))
+        if not os.path.isdir(os.path.join(self.package_folder, "bin")):
+            os.makedirs(os.path.join(self.package_folder, "bin"))
         freetype_config = os.path.join(self.package_folder, "bin", "freetype-config")
         shutil.copy(freetype_config_in, freetype_config)
         libs = "-lfreetyped" if self.settings.build_type == "Debug" else "-lfreetype"
