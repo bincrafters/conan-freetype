@@ -92,6 +92,8 @@ class FreetypeConan(ConanFile):
             cmake.definitions['CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS'] = self.options.shared
         cmake.definitions["WITH_ZLIB"] = self.options.with_zlib
         cmake.definitions["WITH_PNG"] = self.options.with_png
+        cmake.definitions["WITH_HARFBUZZ"] = False
+        cmake.definitions["CMAKE_DISABLE_FIND_PACKAGE_HarfBuzz"] = True
         cmake.configure(build_dir=self.build_subfolder)
         return cmake
 
