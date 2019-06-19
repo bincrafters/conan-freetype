@@ -12,7 +12,7 @@ class FreetypeConan(ConanFile):
     description = "FreeType is a freely available software library to render fonts."
     url = "http://github.com/bincrafters/conan-freetype"
     homepage = "https://www.freetype.org"
-    license = "FTL"
+    license = "FTL", "GPL-2.0-only"
     topics = ("conan", "freetype", "fonts")
     author = "Bincrafters <bincrafters@gmail.com>"
     exports = ["LICENSE.md"]
