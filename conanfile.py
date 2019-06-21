@@ -8,7 +8,7 @@ import shutil
 
 class FreetypeConan(ConanFile):
     name = "freetype"
-    version = "2.9.1"
+    version = "2.10.0"
     description = "FreeType is a freely available software library to render fonts."
     url = "http://github.com/bincrafters/conan-freetype"
     homepage = "https://www.freetype.org"
@@ -53,10 +53,10 @@ class FreetypeConan(ConanFile):
 
     def source(self):
         source_url = "https://download.savannah.gnu.org/releases/"
-        version = self.version[:-2]
+        version = self.version
         archive_file = '{0}-{1}.tar.gz'.format(self.name, version)
         source_file = '{0}/{1}/{2}'.format(source_url, self.name, archive_file)
-        sha256 = "bf380e4d7c4f3b5b1c1a7b2bf3abb967bda5e9ab480d0df656e0e08c5019c5e6"
+        sha256 = "955e17244e9b38adb0c98df66abb50467312e6bb70eac07e49ce6bd1a20e809a"
         tools.get(source_file, sha256=sha256)
         os.rename('{0}-{1}'.format(self.name, version), self._source_subfolder)
         self._patch_windows()
