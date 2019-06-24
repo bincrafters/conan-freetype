@@ -59,22 +59,6 @@ class FreetypeConan(ConanFile):
         sha256 = "955e17244e9b38adb0c98df66abb50467312e6bb70eac07e49ce6bd1a20e809a"
         tools.get(source_file, sha256=sha256)
         os.rename('{0}-{1}'.format(self.name, version), self._source_subfolder)
-        self._patch_windows()
-
-    def _patch_windows(self):
-        if self.settings.os == "Windows":
-            pattern = 'if (WIN32 AND NOT MINGW AND BUILD_SHARED_LIBS)\n' + \
-                      '  message(FATAL_ERROR "Building shared libraries on Windows needs MinGW")\n' + \
-                      'endif ()\n'
-            cmake_file = os.path.join(self._source_subfolder, 'CMakeLists.txt')
-            tools.replace_in_file(cmake_file, pattern, '')
-
-    def _patch_msvc_mt(self):
-        if self.settings.os == "Windows" and \
-           self.settings.compiler == "Visual Studio" and \
-           "MT" in self.settings.compiler.runtime:
-            header_file = os.path.join(self._source_subfolder, "include", "freetype", "config", "ftconfig.h")
-            tools.replace_in_file(header_file, "#ifdef _MSC_VER", "#if 0")
 
     def _configure_cmake(self):
         cmake = CMake(self)
@@ -105,7 +89,6 @@ class FreetypeConan(ConanFile):
         return cmake
 
     def build(self):
-        self._patch_msvc_mt()
         cmake = self._configure_cmake()
         cmake.build()
 
