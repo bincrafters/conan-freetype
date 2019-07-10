@@ -9,6 +9,7 @@ import shutil
 class FreetypeConan(ConanFile):
     name = "freetype"
     version = "2.10.0"
+    libtool_version = "23.0.17"  # check docs/version.txt, this is a different version mumber!
     description = "FreeType is a freely available software library to render fonts."
     url = "http://github.com/bincrafters/conan-freetype"
     homepage = "https://www.freetype.org"
@@ -79,7 +80,7 @@ class FreetypeConan(ConanFile):
             cmake.definitions["PC_BZIP2_LIBRARY"] = '-l%s' % self.deps_cpp_info['bzip2'].libs[0]
         else:
             cmake.definitions["PC_BZIP2_LIBRARY"] = ''
-        cmake.definitions["PROJECT_VERSION"] = self.version
+        cmake.definitions["PROJECT_VERSION"] = self.libtool_version
         cmake.definitions["WITH_ZLIB"] = self.options.with_zlib
         cmake.definitions["WITH_PNG"] = self.options.with_png
         cmake.definitions["WITH_BZip2"] = self.options.with_bzip2
@@ -100,7 +101,6 @@ class FreetypeConan(ConanFile):
         shutil.copy(freetype_config_in, freetype_config)
         libs = "-lfreetyped" if self.settings.build_type == "Debug" else "-lfreetype"
         staticlibs = "-lm %s" % libs if self.settings.os == "Linux" else libs
-        libtool_version = "22.0.16"  # check docs/version.txt, this is a different version mumber!
         tools.replace_in_file(freetype_config, r"%PKG_CONFIG%", r"/bin/false")  # never use pkg-config
         tools.replace_in_file(freetype_config, r"%prefix%", r"$conan_prefix")
         tools.replace_in_file(freetype_config, r"%exec_prefix%", r"$conan_exec_prefix")
@@ -117,7 +117,7 @@ conan_includedir=${{conan_prefix}}/include
 conan_libdir=${{conan_prefix}}/lib
 conan_ftversion={version}
 conan_staticlibs="{staticlibs}"
-""".format(version=libtool_version, staticlibs=staticlibs))
+""".format(version=self.libtool_version, staticlibs=staticlibs))
 
     def package(self):
         cmake = self._configure_cmake()
@@ -126,6 +126,12 @@ conan_staticlibs="{staticlibs}"
         self.copy("FTL.TXT", dst="licenses", src=os.path.join(self._source_subfolder, "docs"))
         self.copy("GPLv2.TXT", dst="licenses", src=os.path.join(self._source_subfolder, "docs"))
         self.copy("LICENSE.TXT", dst="licenses", src=os.path.join(self._source_subfolder, "docs"))
+        # freetype's own pkg-config is broken - it uses freetype instead of freetyped for Debug,
+        # and also uses incorrect version
+        freetype_pc = os.path.join(self.package_folder, "lib", "pkgconfig", "freetype.pc")
+        freetype2_pc = os.path.join(self.package_folder, "lib", "pkgconfig", "freetype2.pc")
+        os.unlink(freetype2_pc)
+        shutil.copyfile(freetype_pc, freetype2_pc)
 
     @staticmethod
     def _chmod_plus_x(filename):
