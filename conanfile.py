@@ -140,6 +140,7 @@ conan_staticlibs="{staticlibs}"
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
+        self.cpp_info.builddirs = ["lib/pkgconfig"]
         if self.settings.os == "Linux":
             self.cpp_info.libs.append("m")
         self.cpp_info.includedirs.append(os.path.join("include", "freetype2"))
