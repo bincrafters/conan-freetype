@@ -9,7 +9,7 @@ import shutil
 class FreetypeConan(ConanFile):
     name = "freetype"
     version = "2.10.0"
-    libtool_version = "23.0.17"  # check docs/version.txt, this is a different version mumber!
+    _libtool_version = "23.0.17"  # check docs/version.txt, this is a different version mumber!
     description = "FreeType is a freely available software library to render fonts."
     url = "http://github.com/bincrafters/conan-freetype"
     homepage = "https://www.freetype.org"
