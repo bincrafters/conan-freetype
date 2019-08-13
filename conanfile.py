@@ -43,7 +43,7 @@ class FreetypeConan(ConanFile):
         if self.options.with_zlib:
             self.requires.add("zlib/1.2.11@conan/stable")
         if self.options.with_bzip2:
-            self.requires.add("bzip2/1.0.6@conan/stable")
+            self.requires.add("bzip2/1.0.8@conan/stable")
 
     def config_options(self):
         if self.settings.os == "Windows":
