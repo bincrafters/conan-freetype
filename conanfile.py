@@ -117,7 +117,7 @@ conan_includedir=${{conan_prefix}}/include
 conan_libdir=${{conan_prefix}}/lib
 conan_ftversion={version}
 conan_staticlibs="{staticlibs}"
-""".format(version=self.libtool_version, staticlibs=staticlibs))
+""".format(version=self._libtool_version, staticlibs=staticlibs))
 
     def package(self):
         cmake = self._configure_cmake()
