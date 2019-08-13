@@ -80,7 +80,7 @@ class FreetypeConan(ConanFile):
             cmake.definitions["PC_BZIP2_LIBRARY"] = '-l%s' % self.deps_cpp_info['bzip2'].libs[0]
         else:
             cmake.definitions["PC_BZIP2_LIBRARY"] = ''
-        cmake.definitions["PROJECT_VERSION"] = self.libtool_version
+        cmake.definitions["PROJECT_VERSION"] = self._libtool_version
         cmake.definitions["WITH_ZLIB"] = self.options.with_zlib
         cmake.definitions["WITH_PNG"] = self.options.with_png
         cmake.definitions["WITH_BZip2"] = self.options.with_bzip2
