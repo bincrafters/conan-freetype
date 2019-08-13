@@ -9,7 +9,7 @@ import shutil
 class FreetypeConan(ConanFile):
     name = "freetype"
     version = "2.10.0"
-    libtool_version = "23.0.17"  # check docs/version.txt, this is a different version mumber!
+    _libtool_version = "23.0.17"  # check docs/version.txt, this is a different version mumber!
     description = "FreeType is a freely available software library to render fonts."
     url = "http://github.com/bincrafters/conan-freetype"
     homepage = "https://www.freetype.org"
@@ -43,7 +43,7 @@ class FreetypeConan(ConanFile):
         if self.options.with_zlib:
             self.requires.add("zlib/1.2.11@conan/stable")
         if self.options.with_bzip2:
-            self.requires.add("bzip2/1.0.6@conan/stable")
+            self.requires.add("bzip2/1.0.8@conan/stable")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -80,7 +80,7 @@ class FreetypeConan(ConanFile):
             cmake.definitions["PC_BZIP2_LIBRARY"] = '-l%s' % self.deps_cpp_info['bzip2'].libs[0]
         else:
             cmake.definitions["PC_BZIP2_LIBRARY"] = ''
-        cmake.definitions["PROJECT_VERSION"] = self.libtool_version
+        cmake.definitions["PROJECT_VERSION"] = self._libtool_version
         cmake.definitions["WITH_ZLIB"] = self.options.with_zlib
         cmake.definitions["WITH_PNG"] = self.options.with_png
         cmake.definitions["WITH_BZip2"] = self.options.with_bzip2
@@ -117,7 +117,7 @@ conan_includedir=${{conan_prefix}}/include
 conan_libdir=${{conan_prefix}}/lib
 conan_ftversion={version}
 conan_staticlibs="{staticlibs}"
-""".format(version=self.libtool_version, staticlibs=staticlibs))
+""".format(version=self._libtool_version, staticlibs=staticlibs))
 
     def package(self):
         cmake = self._configure_cmake()
