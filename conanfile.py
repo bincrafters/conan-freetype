@@ -51,6 +51,7 @@ class FreetypeConan(ConanFile):
 
     def configure(self):
         del self.settings.compiler.libcxx
+        del self.settings.compiler.cppstd
 
     def source(self):
         source_url = "https://download.savannah.gnu.org/releases/"
